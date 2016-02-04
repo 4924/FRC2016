@@ -2,6 +2,9 @@
 package org.usfirst.frc.team4924.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +21,11 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     String autoSelected;
     SendableChooser chooser;
+    RobotDrive myRobot;  // class that handles basic drive operations
+    Joystick leftStick;  // set to ID 1 in DriverStation
+    Talon leftMotor;
+    Talon rightMotor;
+
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -28,6 +36,10 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
+        myRobot = new RobotDrive(0, 1);
+        myRobot.setExpiration(0.1); 
+        leftMotor = new Talon(2);
+        rightMotor = new Talon(3);
     }
     
 	/**
@@ -64,7 +76,7 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        
+    	myRobot.arcadeDrive(leftStick.getY()*-1, leftStick.getX()*-1);
     }
     
     /**
