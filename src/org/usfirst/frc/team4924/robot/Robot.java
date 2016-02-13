@@ -138,7 +138,7 @@ public class Robot extends IterativeRobot {
             camY.set(pstick.getY()*calY+calY);        	
         }
         
-    	if(pstick.getRawButton(1)&&comp_bool) {
+    	if(stick.getRawButton(8)&&comp_bool) {
     		comp_bool = !comp_bool;
     		if(comp.enabled()) {
     			comp.stop();
@@ -158,6 +158,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("CamY", camY.get());
         SmartDashboard.putNumber("CalX", calX);
         SmartDashboard.putNumber("CalY", calY);
+        SmartDashboard.putBoolean("Compessor", comp.enabled());
     }
     
     /**
