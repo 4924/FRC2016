@@ -28,6 +28,7 @@ public class Robot extends IterativeRobot {
 	boolean direction_bool = true;
 	boolean arm_bool = true;
 	boolean cal_bool = true;
+	boolean comp_bool = true;
 	int autoLoopCounter;
 	SmartDashboard dash;
     Compressor comp;
@@ -135,7 +136,22 @@ public class Robot extends IterativeRobot {
             camY.set(pstick.getY()*(1-calY)+calY);
         } else {
             camY.set(pstick.getY()*calY+calY);        	
-        }        
+        }
+        
+    	if(pstick.getRawButton(1)&&comp_bool) {
+    		comp_bool = !comp_bool;
+    		if(comp.enabled()) {
+    			comp.stop();
+    		} else {
+    			comp.start();
+    		}
+    	} else if(stick.getRawButton(1)&&!comp_bool)  {
+    		
+    	} else if(!comp_bool) {
+    		comp_bool = !comp_bool;
+    	} else {
+    		
+    	}
         
         camY.set((pstick.getY()+1)/2);
         SmartDashboard.putNumber("CamX", camX.get());
