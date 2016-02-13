@@ -112,7 +112,7 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
-    	if(stick.getRawButton(8)&&cal_bool) {
+    	if(pstick.getRawButton(1)&&cal_bool) {
     		cal_bool = !cal_bool;
     		calX = camX.get();
     		calY = camY.get();
