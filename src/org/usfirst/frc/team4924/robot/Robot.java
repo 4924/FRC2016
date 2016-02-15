@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4924.robot;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -43,11 +44,11 @@ public class Robot extends IterativeRobot {
     double camdX;
     Servo camX;
     double camdY;
-    TalonSRX motor1;
+    CANTalon motor1;
     double motor1speed;
     double motor2speed;
-    TalonSRX motor2;
-    TalonSRX motor3;
+    CANTalon motor2;
+    CANTalon motor3;
 
 	
     /**
@@ -72,9 +73,9 @@ public class Robot extends IterativeRobot {
         comp.start();
         camY = new Servo(4);
         camX = new Servo(3);
-        motor1 = new TalonSRX(2);
-        motor2 = new TalonSRX(3);
-        motor3 = new  TalonSRX(4);
+        motor1 = new CANTalon(2);
+        motor2 = new CANTalon(3);
+        motor3 = new  CANTalon(4);
         motor1speed = prefs.getDouble("motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
     }
