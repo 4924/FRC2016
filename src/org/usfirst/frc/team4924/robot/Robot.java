@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.TalonSRX;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -76,8 +75,8 @@ public class Robot extends IterativeRobot {
         motor1 = new CANTalon(2);
         motor2 = new CANTalon(3);
         motor3 = new  CANTalon(4);
-        motor1speed = prefs.getDouble("motor 1 Speed", 0);
-        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
+//        motor1speed = prefs.getDouble("motor 1 Speed", 0);
+//        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
     }
     
     /**
