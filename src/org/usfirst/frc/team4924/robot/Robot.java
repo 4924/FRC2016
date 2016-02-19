@@ -1,7 +1,9 @@
 package org.usfirst.frc.team4924.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -30,6 +32,8 @@ public class Robot extends IterativeRobot {
 	double calY = 0.5;
 	boolean direction_bool = true;
 	boolean arm_bool = true;
+	boolean arm_bool1 = true;
+	boolean where_arm = true;
 	boolean cal_bool = true;
 	boolean comp_bool = true;
 	boolean comp_on_bool = true;
@@ -39,6 +43,8 @@ public class Robot extends IterativeRobot {
     Compressor comp;
 	Solenoid sol1;
     Solenoid sol2;
+	Solenoid sol3;
+    Solenoid sol4;
     Servo camY;
     double camdX;
     Servo camX;
@@ -48,6 +54,8 @@ public class Robot extends IterativeRobot {
     double motor2speed;
     CANTalon motor2;
     CANTalon motor3;
+    DigitalInput arm_hal;
+    AnalogInput psi;
 
 	
     /**
@@ -59,6 +67,7 @@ public class Robot extends IterativeRobot {
 	}
 	
     public void robotInit() {
+    	prefs = Preferences. getInstance();
     	myRobot = new RobotDrive(0,1);
     	stick = new Joystick(0);
     	pstick = new Joystick(1);
@@ -67,16 +76,20 @@ public class Robot extends IterativeRobot {
     	comp = new Compressor();
     	sol1 = new Solenoid(0);
         sol2 = new Solenoid(1);
-    	sol1.set(true);
-    	sol2.set(false);
+    	sol3 = new Solenoid(2);
+        sol4 = new Solenoid(3);
+    	sol1.set(where_arm);
+    	sol2.set(!where_arm);
         comp.start();
         camY = new Servo(4);
         camX = new Servo(3);
         motor1 = new CANTalon(2);
-        motor2 = new CANTalon(3);
-        motor3 = new  CANTalon(4);
-//        motor1speed = prefs.getDouble("motor 1 Speed", 0);
-//        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
+        motor2 = new CANTalon(4);
+        motor3 = new  CANTalon(3);
+        arm_hal = new DigitalInput(1);
+        psi = new AnalogInput(0);
+        motor1speed = prefs.getDouble("Motor 1 Speed", 0);
+        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
     }
     
     /**
@@ -119,8 +132,9 @@ public class Robot extends IterativeRobot {
     	}
     	
     	if(stick.getRawButton(1)&&arm_bool) {
-    		sol1.set(!sol1.get());
-    		sol2.set(!sol2.get());
+    		where_arm = !where_arm;
+    		sol1.set(where_arm);
+    		sol2.set(!where_arm);
     		arm_bool = !arm_bool;
     	} else if(stick.getRawButton(1)&&!arm_bool)  {
     		
@@ -128,6 +142,23 @@ public class Robot extends IterativeRobot {
     		arm_bool = !arm_bool;
     	} else {
     		
+    	}
+    	
+    	if(stick.getRawButton(4)&&arm_bool1) {
+    		sol3.set(!sol3.get());
+    		sol4.set(!sol4.get());
+    		arm_bool1 = !arm_bool1;
+    	} else if(stick.getRawButton(1)&&!arm_bool1)  {
+    		
+    	} else if(!arm_bool1) {
+    		arm_bool1 = !arm_bool1;
+    	} else {
+    		
+    	}
+    	
+    	if(!where_arm&&!arm_hal.get()) {
+    		sol1.set(false);
+    		sol2.set(false);
     	}
     	
     	if(pstick.getRawButton(1)&&cal_bool) {
@@ -180,10 +211,15 @@ public class Robot extends IterativeRobot {
     	if(stick.getRawButton(2)) {
     		motor1.set(motor1speed);
     		motor2.set(motor2speed);
+    	}else{
+    		motor1.set(0);
+    		motor2.set(0);
     	}
     	
     	if(stick.getRawButton(3)) {
     		motor3.set(0.5);
+    	}else{
+    		motor3.set(0);
     	}
     	
     	if(pstick.getRawButton(2)) {
@@ -191,12 +227,17 @@ public class Robot extends IterativeRobot {
     	    calY = 0.5;
     	}
         
-
+    	motor1speed = prefs.getDouble("Motor 1 Speed", 0);
+        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
         SmartDashboard.putNumber("CamX", camX.get());
         SmartDashboard.putNumber("CamY", camY.get());
         SmartDashboard.putNumber("CalX", calX);
         SmartDashboard.putNumber("CalY", calY);
+        SmartDashboard.putNumber("motor1ball", motor1speed);
+        SmartDashboard.putNumber("motor2ball", motor2speed);
+        SmartDashboard.putNumber("Pressure", psi.getValue());
         SmartDashboard.putBoolean("Compessor", comp_on_bool);
+        SmartDashboard.putBoolean("Sensor", arm_hal.get());
     }
     
     /**
