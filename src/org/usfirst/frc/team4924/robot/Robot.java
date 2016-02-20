@@ -33,6 +33,7 @@ public class Robot extends IterativeRobot {
 	boolean direction_bool = true;
 	boolean arm_bool = true;
 	boolean arm_bool1 = true;
+	boolean arm_bool2 = true;
 	boolean where_arm = true;
 	boolean cal_bool = true;
 	boolean comp_bool = true;
@@ -45,6 +46,8 @@ public class Robot extends IterativeRobot {
     Solenoid sol2;
 	Solenoid sol3;
     Solenoid sol4;
+	Solenoid sol5;
+    Solenoid sol6;
     Servo camY;
     double camdX;
     Servo camX;
@@ -78,9 +81,15 @@ public class Robot extends IterativeRobot {
         sol2 = new Solenoid(1);
     	sol3 = new Solenoid(2);
         sol4 = new Solenoid(3);
+    	sol5 = new Solenoid(4);
+        sol6 = new Solenoid(5);        
     	sol1.set(where_arm);
     	sol2.set(!where_arm);
-        comp.start();
+    	sol3.set(true);
+    	sol4.set(false);
+    	sol5.set(false);
+    	sol6.set(true);
+    	comp.start();
         camY = new Servo(4);
         camX = new Servo(3);
         motor1 = new CANTalon(2);
@@ -148,10 +157,22 @@ public class Robot extends IterativeRobot {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
     		arm_bool1 = !arm_bool1;
-    	} else if(stick.getRawButton(1)&&!arm_bool1)  {
+    	} else if(stick.getRawButton(4)&&!arm_bool1)  {
     		
     	} else if(!arm_bool1) {
     		arm_bool1 = !arm_bool1;
+    	} else {
+    		
+    	}
+    	
+    	if(stick.getRawButton(6)&&arm_bool2) {
+    		sol5.set(!sol5.get());
+    		sol6.set(!sol6.get());
+    		arm_bool2 = !arm_bool2
+    	} else if(stick.getRawButton(6)&&!arm_bool2)  {
+    		
+    	} else if(!arm_bool2) {
+    		arm_bool2 = !arm_bool2;
     	} else {
     		
     	}
@@ -217,7 +238,7 @@ public class Robot extends IterativeRobot {
     	}
     	
     	if(stick.getRawButton(3)) {
-    		motor3.set(0.5);
+    		motor3.set(-0.5);
     	}else{
     		motor3.set(0);
     	}
