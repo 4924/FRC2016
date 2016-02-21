@@ -34,10 +34,11 @@ public class Robot extends IterativeRobot {
 	boolean arm_bool = true;
 	boolean arm_bool1 = true;
 	boolean arm_bool2 = true;
-	boolean where_arm = true;
+	boolean where_arm = false;
 	boolean cal_bool = true;
 	boolean comp_bool = true;
 	boolean comp_on_bool = true;
+	boolean where_finger = true;
 	boolean arm = true;
 	int autoLoopCounter;
 	SmartDashboard dash;
@@ -50,6 +51,7 @@ public class Robot extends IterativeRobot {
     Solenoid sol6;
     Servo camY;
     double camdX;
+    int intake_num = 0;
     Servo camX;
     double camdY;
     CANTalon motor1;
@@ -96,7 +98,7 @@ public class Robot extends IterativeRobot {
         motor2 = new CANTalon(4);
         motor3 = new  CANTalon(3);
         arm_hal = new DigitalInput(1);
-        psi = new AnalogInput(0);
+        psi = new AnalogInput(3);
         motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
     }
@@ -129,6 +131,8 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	
+    	//CHANGE DIRECTION
     	if(stick.getRawButton(5)&&direction_bool) {
     		direction_bool = !direction_bool;
     		direction = direction * -1;
@@ -140,6 +144,7 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
+    	//ARM CONTROL
     	if(stick.getRawButton(1)&&arm_bool) {
     		where_arm = !where_arm;
     		sol1.set(where_arm);
@@ -153,6 +158,12 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
+    	if(!where_arm&&!arm_hal.get()) {
+    		sol1.set(false);
+    		sol2.set(false);
+    	}
+    	
+    	//SHOOTER CONTROL
     	if(stick.getRawButton(4)&&arm_bool1) {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
@@ -165,23 +176,63 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
+    	//FINGER CONTROL
     	if(stick.getRawButton(6)&&arm_bool2) {
-    		sol5.set(!sol5.get());
-    		sol6.set(!sol6.get());
-    		arm_bool2 = !arm_bool2
+    		sol5.set(!where_finger);
+    		sol6.set(where_finger);
+    		arm_bool2 = !arm_bool2;
+    		where_finger = !where_finger;
     	} else if(stick.getRawButton(6)&&!arm_bool2)  {
     		
     	} else if(!arm_bool2) {
     		arm_bool2 = !arm_bool2;
+    		sol5.set(false);
+    		sol6.set(false);
     	} else {
     		
     	}
     	
-    	if(!where_arm&&!arm_hal.get()) {
-    		sol1.set(false);
-    		sol2.set(false);
+    	//COMP CONTROL
+    	if(stick.getRawButton(8)&&comp_bool) {
+    		comp_bool = !comp_bool;
+    		if(comp_on_bool) {
+    			comp.stop();
+    			comp_on_bool = false;
+    		} else {
+    			comp_on_bool = true;    			
+    			comp.start();
+    		}
+    	} else if(stick.getRawButton(8)&&!comp_bool)  {
+    		
+    	} else if(!comp_bool) {
+    		comp_bool = !comp_bool;
     	}
     	
+    	//BALL SHOOTER CONTROL
+    	if(stick.getRawButton(2)) {
+    		motor1.set(motor1speed);
+    		motor2.set(motor2speed);
+    	}else{
+    		motor1.set(0);
+    		motor2.set(0);
+    	}
+    	
+    	//BALL SHOOTER INTAKE CONTROL
+    	if(stick.getRawButton(3)&&intake_num==0) {
+    		intake_num = 1;
+    		motor3.set(-0.5);
+    	} else if(stick.getRawButton(3)&&intake_num==1)  {
+    		
+    	} else if(intake_num < 20) {
+    		motor3.set(0.5);
+    		intake_num += 1;
+    	} else if(intake_num > 20) {
+    		intake_num = 0;
+    		motor3.set(0);
+    	}
+    	
+    	
+    	//CAMERA
     	if(pstick.getRawButton(1)&&cal_bool) {
     		cal_bool = !cal_bool;
     		calX = camdX;
@@ -190,12 +241,8 @@ public class Robot extends IterativeRobot {
     		
     	} else if(!cal_bool) {
     		cal_bool = !cal_bool;
-    	} else {
-    		
-    	}
-        SmartDashboard.putNumber("Direction", direction);
-        myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
-        
+    	} 
+    	        
         if(pstick.getX()>=0) {
         	camdX = pstick.getX()*(1-calX)+calX;
             camX.set(pstick.getX()*(1-calX)+calX);
@@ -211,43 +258,16 @@ public class Robot extends IterativeRobot {
         	camdY = pstick.getY()*calY+calY;
             camY.set(pstick.getY()*calY+calY);        	
         }
-        
-    	if(stick.getRawButton(8)&&comp_bool) {
-    		comp_bool = !comp_bool;
-    		if(comp_on_bool) {
-    			comp.stop();
-    			comp_on_bool = false;
-    		} else {
-    			comp_on_bool = true;    			
-    			comp.start();
-    		}
-    	} else if(stick.getRawButton(8)&&!comp_bool)  {
-    		
-    	} else if(!comp_bool) {
-    		comp_bool = !comp_bool;
-    	} else {
-    		
-    	}
-    	
-    	if(stick.getRawButton(2)) {
-    		motor1.set(motor1speed);
-    		motor2.set(motor2speed);
-    	}else{
-    		motor1.set(0);
-    		motor2.set(0);
-    	}
-    	
-    	if(stick.getRawButton(3)) {
-    		motor3.set(-0.5);
-    	}else{
-    		motor3.set(0);
-    	}
     	
     	if(pstick.getRawButton(2)) {
     		calX = 0.5;
     	    calY = 0.5;
     	}
-        
+        //CAMERA
+    	
+    	
+    	
+    	
     	motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
         SmartDashboard.putNumber("CamX", camX.get());
@@ -257,8 +277,12 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("motor1ball", motor1speed);
         SmartDashboard.putNumber("motor2ball", motor2speed);
         SmartDashboard.putNumber("Pressure", psi.getValue());
+        SmartDashboard.putNumber("Pressure1", (5.000/4096.000) * psi.getValue());
+        SmartDashboard.putNumber("Pressure2", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
         SmartDashboard.putBoolean("Compessor", comp_on_bool);
         SmartDashboard.putBoolean("Sensor", arm_hal.get());
+        SmartDashboard.putNumber("Direction", direction);
+        myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
     }
     
     /**
