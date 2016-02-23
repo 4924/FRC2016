@@ -61,6 +61,7 @@ public class Robot extends IterativeRobot {
     CANTalon motor3;
     DigitalInput arm_hal;
     AnalogInput psi;
+    AnalogInput distance;
 
 	
     /**
@@ -99,6 +100,7 @@ public class Robot extends IterativeRobot {
         motor3 = new  CANTalon(3);
         arm_hal = new DigitalInput(1);
         psi = new AnalogInput(3);
+        distance = new AnalogInput(0);
         motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
     }
@@ -113,6 +115,7 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during autonomous
      */
+    
     public void autonomousPeriodic() {
     	if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
 		{
@@ -276,6 +279,9 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("CalY", calY);
         SmartDashboard.putNumber("motor1ball", motor1speed);
         SmartDashboard.putNumber("motor2ball", motor2speed);
+        SmartDashboard.putNumber("Distance", distance.getValue());
+        SmartDashboard.putNumber("Distance V", (5/4096)*distance.getValue());
+        SmartDashboard.putNumber("Distance mm", ((((5/4096)*distance.getValue())*1000)/4.88)*5);
         SmartDashboard.putNumber("Pressure", psi.getValue());
         SmartDashboard.putNumber("Pressure1", (5.000/4096.000) * psi.getValue());
         SmartDashboard.putNumber("Pressure2", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
