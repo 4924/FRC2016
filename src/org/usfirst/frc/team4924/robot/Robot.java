@@ -34,7 +34,7 @@ public class Robot extends IterativeRobot {
 	boolean arm_bool = true;
 	boolean arm_bool1 = true;
 	boolean arm_bool2 = true;
-	boolean where_arm = false;
+	boolean where_arm = true;
 	boolean cal_bool = true;
 	boolean comp_bool = true;
 	boolean comp_on_bool = true;
@@ -161,7 +161,7 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
-    	if(!where_arm&&!arm_hal.get()) {
+    	if(where_arm==false&&arm_hal.get()==false) {
     		sol1.set(false);
     		sol2.set(false);
     	}
@@ -280,8 +280,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("motor1ball", motor1speed);
         SmartDashboard.putNumber("motor2ball", motor2speed);
         SmartDashboard.putNumber("Distance", distance.getValue());
-        SmartDashboard.putNumber("Distance V", (5/4096)*distance.getValue());
-        SmartDashboard.putNumber("Distance mm", ((((5/4096)*distance.getValue())*1000)/4.88)*5);
+        SmartDashboard.putNumber("Distance V", (5.000/4096.000)*distance.getValue());
+        SmartDashboard.putNumber("Distance mm", ((((5.000/4096.000)*distance.getValue())*1000.000)/4.880)*5.000);
         SmartDashboard.putNumber("Pressure", psi.getValue());
         SmartDashboard.putNumber("Pressure1", (5.000/4096.000) * psi.getValue());
         SmartDashboard.putNumber("Pressure2", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
