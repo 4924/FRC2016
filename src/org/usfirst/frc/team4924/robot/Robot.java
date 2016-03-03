@@ -134,7 +134,17 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-    	
+    	/*
+    	 * 1 Ball Shooter
+    	 * 2 Arm Toggle
+    	 * 3 Ball Intake
+    	 * 4 Ball Shooter Solenoid
+    	 * 5 Change Directions
+    	 * 6 Finger Solenoid
+    	 * 8 Comp Toggle
+    	 * 9 Ball Intake Direction
+    	 * 11 Ball Intake Direction
+    	 */
     	//CHANGE DIRECTION
     	if(stick.getRawButton(5)&&direction_bool) {
     		direction_bool = !direction_bool;
@@ -148,12 +158,12 @@ public class Robot extends IterativeRobot {
     	}
     	
     	//ARM CONTROL
-    	if(stick.getRawButton(1)&&arm_bool) {
+    	if(stick.getRawButton(2)&&arm_bool) {
     		where_arm = !where_arm;
     		sol1.set(where_arm);
     		sol2.set(!where_arm);
     		arm_bool = !arm_bool;
-    	} else if(stick.getRawButton(1)&&!arm_bool)  {
+    	} else if(stick.getRawButton(2)&&!arm_bool)  {
     		
     	} else if(!arm_bool) {
     		arm_bool = !arm_bool;
@@ -166,7 +176,7 @@ public class Robot extends IterativeRobot {
     		sol2.set(false);
     	}
     	
-    	//SHOOTER CONTROL
+    	//SHOOTER SOLENOID CONTROL
     	if(stick.getRawButton(4)&&arm_bool1) {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
@@ -211,8 +221,8 @@ public class Robot extends IterativeRobot {
     		comp_bool = !comp_bool;
     	}
     	
-    	//BALL SHOOTER CONTROL
-    	if(stick.getRawButton(2)) {
+    	//BALL SHOOTER FIRE CONTROL
+    	if(stick.getRawButton(1)) {
     		motor1.set(motor1speed);
     		motor2.set(motor2speed);
     	}else{
@@ -221,7 +231,8 @@ public class Robot extends IterativeRobot {
     	}
     	
     	//BALL SHOOTER INTAKE CONTROL
-    	if(stick.getRawButton(3)&&intake_num==0) {
+    	if(intake_num == -1) {
+    	} else if(stick.getRawButton(3)&&intake_num==0) {
     		intake_num = 1;
     		motor3.set(-0.5);
     	} else if(stick.getRawButton(3)&&intake_num==1)  {
@@ -234,6 +245,16 @@ public class Robot extends IterativeRobot {
     		motor3.set(0);
     	}
     	
+    	if(stick.getRawButton(9)&&intake_num==0) {
+    		intake_num = -1;
+    		motor3.set(0.5);
+    	} else if(stick.getRawButton(11)&&intake_num==0) {
+    		intake_num = -1;
+    		motor3.set(-0.5);
+    	} else if(intake_num==-1) {
+    		intake_num = 0;
+    		motor3.set(0);
+    	}
     	
     	//CAMERA
     	if(pstick.getRawButton(1)&&cal_bool) {
