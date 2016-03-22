@@ -57,6 +57,7 @@ public class Robot extends IterativeRobot {
     CANTalon motor1;
     double motor1speed;
     double motor2speed;
+    double pullback;
     CANTalon motor2;
     CANTalon motor3;
     DigitalInput arm_hal;
@@ -103,6 +104,7 @@ public class Robot extends IterativeRobot {
         distance = new AnalogInput(0);
         motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
+        pullback = prefs.getDouble("pullback", 0);
     }
     
     /**
@@ -237,20 +239,20 @@ public class Robot extends IterativeRobot {
     		motor3.set(-0.5);
     	} else if(stick.getRawButton(3)&&intake_num==1)  {
     		
-    	} else if(intake_num < 20) {
+    	} else if(intake_num < pullback) {
     		motor3.set(0.5);
     		intake_num += 1;
-    	} else if(intake_num > 20) {
+    	} else if(intake_num >= pullback) {
     		intake_num = 0;
     		motor3.set(0);
     	}
     	
     	if(stick.getRawButton(9)&&intake_num==0) {
     		intake_num = -1;
-    		motor3.set(0.5);
+    		motor3.set(1);
     	} else if(stick.getRawButton(11)&&intake_num==0) {
     		intake_num = -1;
-    		motor3.set(-0.5);
+    		motor3.set(-1);
     	} else if(intake_num==-1) {
     		intake_num = 0;
     		motor3.set(0);
@@ -294,18 +296,16 @@ public class Robot extends IterativeRobot {
     	
     	motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
+        pullback = prefs.getDouble("pullback", 0);
         SmartDashboard.putNumber("CamX", camX.get());
         SmartDashboard.putNumber("CamY", camY.get());
         SmartDashboard.putNumber("CalX", calX);
         SmartDashboard.putNumber("CalY", calY);
         SmartDashboard.putNumber("motor1ball", motor1speed);
         SmartDashboard.putNumber("motor2ball", motor2speed);
-        SmartDashboard.putNumber("Distance", distance.getValue());
-        SmartDashboard.putNumber("Distance V", (5.000/4096.000)*distance.getValue());
+        SmartDashboard.putNumber("pullback", pullback);
         SmartDashboard.putNumber("Distance mm", ((((5.000/4096.000)*distance.getValue())*1000.000)/4.880)*5.000);
-        SmartDashboard.putNumber("Pressure", psi.getValue());
-        SmartDashboard.putNumber("Pressure1", (5.000/4096.000) * psi.getValue());
-        SmartDashboard.putNumber("Pressure2", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
+        SmartDashboard.putNumber("Pressure", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
         SmartDashboard.putBoolean("Compessor", comp_on_bool);
         SmartDashboard.putBoolean("Sensor", arm_hal.get());
         SmartDashboard.putNumber("Direction", direction);
