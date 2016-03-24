@@ -37,12 +37,12 @@ public class Robot extends IterativeRobot {
     
 	double direction = 1;
 	boolean direction_bool = true;
-	//true is down
-	boolean arm_bool = true;
+	//false is down
+	boolean arm_bool = false;
 	//true is down
 	boolean launcher_bool = true;
-	//true is in
-	boolean finger_bool = true;
+	//false is in
+	boolean finger_bool = false;
 	//true is runnning
 	boolean comp_bool = true;
 	boolean where_comp = true;
@@ -105,8 +105,6 @@ public class Robot extends IterativeRobot {
         arm_hal = new DigitalInput(1);
         psi = new AnalogInput(3);
         distance = new AnalogInput(0);
-        motor1speed = prefs.getDouble("Motor 1 Speed", 0);
-        motor2speed = prefs.getDouble("Motor 2 Speed", 0);
         pullback = prefs.getDouble("pullback", 0);
     }
     
@@ -124,7 +122,7 @@ public class Robot extends IterativeRobot {
     public void autonomousPeriodic() {
     	if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
 		{
-			myRobot.drive(-0.5, 0.0); 	// drive forwards half speed
+			myRobot.drive(-1, 0.0); 	// drive forwards half speed
 			autoLoopCounter++;
 			} else {
 			myRobot.drive(0.0, 0.0); 	// stop robot
@@ -166,8 +164,8 @@ public class Robot extends IterativeRobot {
     	//ARM CONTROL
     	if(stick.getRawButton(2)&&arm_bool) {
     		where_arm = !where_arm;
-    		sol1.set(where_arm);
-    		sol2.set(!where_arm);
+    		sol1.set(!where_arm);
+    		sol2.set(where_arm);
     		arm_bool = !arm_bool;
     	} else if(stick.getRawButton(2)&&!arm_bool)  {
     		
@@ -197,7 +195,7 @@ public class Robot extends IterativeRobot {
     	
     	//FINGER CONTROL
     	if(stick.getRawButton(6)&&finger_bool) {
-    		if(where_arm&&where_finger) {
+    		if(!where_arm&&!where_finger) {
     			
     		} else {
     			sol5.set(!where_finger);
@@ -232,17 +230,17 @@ public class Robot extends IterativeRobot {
     	}
     	
     	//BALL SHOOTER FIRE CONTROL
-    	if(stick.getRawButton(1)) {
-    		motor1.set(motor1speed);
-    		motor2.set(motor2speed);
+    	if(stick.getRawButton(12)) {
+    		motor1.set(-0.6);
+    		motor2.set(0.6);
     	}else{
     		motor1.set(0);
     		motor2.set(0);
     	}
     	
-    	if(stick.getRawButton(12)) {
-    		motor1.set(-0.5);
-    		motor2.set(0.5);
+    	if(stick.getRawButton(1)) {
+    		motor1.set(0.6);
+    		motor2.set(-0.6);
     	} else {
     		motor1.set(0);
     		motor2.set(0);
