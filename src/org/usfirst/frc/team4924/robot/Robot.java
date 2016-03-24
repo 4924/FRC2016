@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.buttons.Button;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,21 +23,31 @@ public class Robot extends IterativeRobot {
 	Preferences prefs;
 	RobotDrive myRobot;
 	Joystick stick;
+	
+	//CAMERA
 	Joystick pstick;
-	Button button1; 
-	double direction = 1;
 	double calX = 0.5;
 	double calY = 0.5;
-	boolean direction_bool = true;
-	boolean arm_bool = true;
-	boolean arm_bool1 = true;
-	boolean arm_bool2 = true;
-	boolean where_arm = true;
 	boolean cal_bool = true;
+    Servo camX;
+    double camdY;
+    Servo camY;
+    double camdX;
+    //CAMERA
+    
+	double direction = 1;
+	boolean direction_bool = true;
+	//true is down
+	boolean arm_bool = true;
+	//true is down
+	boolean launcher_bool = true;
+	//true is in
+	boolean finger_bool = true;
+	//true is runnning
 	boolean comp_bool = true;
-	boolean comp_on_bool = true;
+	boolean where_comp = true;
+	boolean where_arm = true;
 	boolean where_finger = true;
-	boolean arm = true;
 	int autoLoopCounter;
 	SmartDashboard dash;
     Compressor comp;
@@ -49,11 +57,7 @@ public class Robot extends IterativeRobot {
     Solenoid sol4;
 	Solenoid sol5;
     Solenoid sol6;
-    Servo camY;
-    double camdX;
     int intake_num = 0;
-    Servo camX;
-    double camdY;
     CANTalon motor1;
     double motor1speed;
     double motor2speed;
@@ -78,7 +82,6 @@ public class Robot extends IterativeRobot {
     	myRobot = new RobotDrive(0,1);
     	stick = new Joystick(0);
     	pstick = new Joystick(1);
-    	button1 = new JoystickButton(stick, 5);
     	dash = new SmartDashboard();
     	comp = new Compressor();
     	sol1 = new Solenoid(0);
@@ -146,6 +149,7 @@ public class Robot extends IterativeRobot {
     	 * 8 Comp Toggle
     	 * 9 Ball Intake Direction
     	 * 11 Ball Intake Direction
+    	 * 12 Reverse Motor
     	 */
     	//CHANGE DIRECTION
     	if(stick.getRawButton(5)&&direction_bool) {
@@ -179,28 +183,32 @@ public class Robot extends IterativeRobot {
     	}
     	
     	//SHOOTER SOLENOID CONTROL
-    	if(stick.getRawButton(4)&&arm_bool1) {
+    	if(stick.getRawButton(4)&launcher_bool) {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
-    		arm_bool1 = !arm_bool1;
-    	} else if(stick.getRawButton(4)&&!arm_bool1)  {
+    		launcher_bool = !launcher_bool;
+    	} else if(stick.getRawButton(4)&&!launcher_bool)  {
     		
-    	} else if(!arm_bool1) {
-    		arm_bool1 = !arm_bool1;
+    	} else if(!launcher_bool) {
+    		launcher_bool = !launcher_bool;
     	} else {
     		
     	}
     	
     	//FINGER CONTROL
-    	if(stick.getRawButton(6)&&arm_bool2) {
-    		sol5.set(!where_finger);
-    		sol6.set(where_finger);
-    		arm_bool2 = !arm_bool2;
-    		where_finger = !where_finger;
-    	} else if(stick.getRawButton(6)&&!arm_bool2)  {
+    	if(stick.getRawButton(6)&&finger_bool) {
+    		if(where_arm&&where_finger) {
+    			
+    		} else {
+    			sol5.set(!where_finger);
+    			sol6.set(where_finger);
+    			finger_bool = !finger_bool;
+    			where_finger = !where_finger;
+    		}
+    	} else if(stick.getRawButton(6)&&!finger_bool)  {
     		
-    	} else if(!arm_bool2) {
-    		arm_bool2 = !arm_bool2;
+    	} else if(!finger_bool) {
+    		finger_bool = !finger_bool;
     		sol5.set(false);
     		sol6.set(false);
     	} else {
@@ -210,11 +218,11 @@ public class Robot extends IterativeRobot {
     	//COMP CONTROL
     	if(stick.getRawButton(8)&&comp_bool) {
     		comp_bool = !comp_bool;
-    		if(comp_on_bool) {
+    		if(where_comp) {
     			comp.stop();
-    			comp_on_bool = false;
+    			where_comp = false;
     		} else {
-    			comp_on_bool = true;    			
+    			where_comp = true;    			
     			comp.start();
     		}
     	} else if(stick.getRawButton(8)&&!comp_bool)  {
@@ -228,6 +236,14 @@ public class Robot extends IterativeRobot {
     		motor1.set(motor1speed);
     		motor2.set(motor2speed);
     	}else{
+    		motor1.set(0);
+    		motor2.set(0);
+    	}
+    	
+    	if(stick.getRawButton(12)) {
+    		motor1.set(-0.5);
+    		motor2.set(0.5);
+    	} else {
     		motor1.set(0);
     		motor2.set(0);
     	}
@@ -306,7 +322,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("pullback", pullback);
         SmartDashboard.putNumber("Distance mm", ((((5.000/4096.000)*distance.getValue())*1000.000)/4.880)*5.000);
         SmartDashboard.putNumber("Pressure", 50.000*((5.000/4096.000) * psi.getValue())-25.000 );
-        SmartDashboard.putBoolean("Compessor", comp_on_bool);
+        SmartDashboard.putBoolean("Compessor", where_comp);
         SmartDashboard.putBoolean("Sensor", arm_hal.get());
         SmartDashboard.putNumber("Direction", direction);
         myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
