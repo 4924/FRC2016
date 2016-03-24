@@ -239,10 +239,10 @@ public class Robot extends IterativeRobot {
     		motor3.set(-0.5);
     	} else if(stick.getRawButton(3)&&intake_num==1)  {
     		
-    	} else if(intake_num < pullback) {
+    	} else if(intake_num < pullback&&intake_num != 0) {
     		motor3.set(0.5);
     		intake_num += 1;
-    	} else if(intake_num >= pullback) {
+    	} else if(intake_num >= pullback&&intake_num != 0) {
     		intake_num = 0;
     		motor3.set(0);
     	}
