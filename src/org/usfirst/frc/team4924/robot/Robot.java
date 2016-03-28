@@ -35,6 +35,8 @@ public class Robot extends IterativeRobot {
     double camdX;
     //CAMERA
     
+    double autoNum;
+    
 	double direction = 1;
 	boolean direction_bool = true;
 	//false is down
@@ -92,8 +94,8 @@ public class Robot extends IterativeRobot {
         sol6 = new Solenoid(5);        
     	sol1.set(where_arm);
     	sol2.set(!where_arm);
-    	sol3.set(true);
-    	sol4.set(false);
+    	sol3.set(false);
+    	sol4.set(true);
     	sol5.set(false);
     	sol6.set(true);
     	comp.start();
@@ -120,9 +122,19 @@ public class Robot extends IterativeRobot {
      */
     
     public void autonomousPeriodic() {
-    	if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
+
+    	if(autoLoopCounter < 3) {
+        	sol3.set(false);
+        	sol4.set(true);
+        	if(stick.getRawAxis(3)>0){
+        		autoNum = -0.8;
+        	} else {
+        		autoNum = 0;
+        	}
+        	autoLoopCounter++;
+    	} else if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
 		{
-			myRobot.drive(-1, 0.0); 	// drive forwards half speed
+			myRobot.drive(autoNum, 0.0); 	// drive forwards half speed
 			autoLoopCounter++;
 			} else {
 			myRobot.drive(0.0, 0.0); 	// stop robot
@@ -323,7 +335,11 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putBoolean("Compessor", where_comp);
         SmartDashboard.putBoolean("Sensor", arm_hal.get());
         SmartDashboard.putNumber("Direction", direction);
-        myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
+        if(sol3.get()==true) {
+        	myRobot.arcadeDrive(stick.getY()*direction*0.7, stick.getX()*-1);
+        } else {
+        	myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
+        }
     }
     
     /**
