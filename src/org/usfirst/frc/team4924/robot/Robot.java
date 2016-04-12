@@ -23,6 +23,7 @@ public class Robot extends IterativeRobot {
 	Preferences prefs;
 	RobotDrive myRobot;
 	Joystick stick;
+	Joystick overRide;
 	
 	//CAMERA
 	Joystick pstick;
@@ -36,7 +37,7 @@ public class Robot extends IterativeRobot {
     //CAMERA
     
     double autoNum;
-    
+    boolean master;
 	double direction = 1;
 	boolean direction_bool = true;
 	//false is down
@@ -69,6 +70,9 @@ public class Robot extends IterativeRobot {
     DigitalInput arm_hal;
     AnalogInput psi;
     AnalogInput distance;
+    double speedChange;
+    boolean speedChangeBool = true;
+    boolean speedChangeBool1 = true;
 
 	
     /**
@@ -84,6 +88,7 @@ public class Robot extends IterativeRobot {
     	myRobot = new RobotDrive(0,1);
     	stick = new Joystick(0);
     	pstick = new Joystick(1);
+    	overRide = new Joystick(2);
     	dash = new SmartDashboard();
     	comp = new Compressor();
     	sol1 = new Solenoid(0);
@@ -108,6 +113,7 @@ public class Robot extends IterativeRobot {
         psi = new AnalogInput(3);
         distance = new AnalogInput(0);
         pullback = prefs.getDouble("pullback", 0);
+        master = false;
     }
     
     /**
@@ -161,128 +167,166 @@ public class Robot extends IterativeRobot {
     	 * 11 Ball Intake Direction
     	 * 12 Reverse Motor
     	 */
-    	//CHANGE DIRECTION
-    	if(stick.getRawButton(5)&&direction_bool) {
-    		direction_bool = !direction_bool;
-    		direction = direction * -1;
-    	} else if(stick.getRawButton(5)&&!direction_bool)  {
+    	
+    	if(overRide.getRawButton(2)&speedChangeBool) {
+    		speedChange = speedChange - 0.1;
+    		speedChangeBool = !speedChangeBool;
+    	} else if(overRide.getRawButton(2)&&!speedChangeBool)  {
     		
-    	} else if(!direction_bool) {
-    		direction_bool = !direction_bool;
+    	} else if(!speedChangeBool) {
+    		speedChangeBool = !speedChangeBool;
     	} else {
     		
     	}
     	
-    	//ARM CONTROL
-    	if(stick.getRawButton(2)&&arm_bool) {
-    		where_arm = !where_arm;
-    		sol1.set(!where_arm);
-    		sol2.set(where_arm);
-    		arm_bool = !arm_bool;
-    	} else if(stick.getRawButton(2)&&!arm_bool)  {
+    	if(overRide.getRawButton(3)&speedChangeBool1) {
+    		speedChange = speedChange + 0.1;
+    		speedChangeBool1 = !speedChangeBool1;
+    	} else if(overRide.getRawButton(3)&&!speedChangeBool1)  {
     		
-    	} else if(!arm_bool) {
-    		arm_bool = !arm_bool;
+    	} else if(!speedChangeBool1) {
+    		speedChangeBool1 = !speedChangeBool1;
     	} else {
     		
     	}
     	
-    	if(where_arm==false&&arm_hal.get()==false) {
-    		sol1.set(false);
-    		sol2.set(false);
+    	if(speedChange<0) {
+    		speedChange = 0;
+    	} else if(speedChange>1){
+    		speedChange = 1;
     	}
     	
-    	//SHOOTER SOLENOID CONTROL
-    	if(stick.getRawButton(4)&launcher_bool) {
-    		sol3.set(!sol3.get());
-    		sol4.set(!sol4.get());
-    		launcher_bool = !launcher_bool;
-    	} else if(stick.getRawButton(4)&&!launcher_bool)  {
+    	if(!overRide.getRawButton(1)) {
+    		//CHANGE DIRECTION
+    		if(stick.getRawButton(5)&&direction_bool) {
+    			direction_bool = !direction_bool;
+    			direction = direction * -1;
+    		} else if(stick.getRawButton(5)&&!direction_bool)  {
     		
-    	} else if(!launcher_bool) {
-    		launcher_bool = !launcher_bool;
-    	} else {
+    		} else if(!direction_bool) {
+    			direction_bool = !direction_bool;
+    		} else {
     		
-    	}
+    		}
     	
-    	//FINGER CONTROL
-    	if(stick.getRawButton(6)&&finger_bool) {
-    		if(!where_arm&&!where_finger) {
+    		//ARM CONTROL
+    		if(stick.getRawButton(2)&&arm_bool) {
+    			where_arm = !where_arm;
+    			sol1.set(!where_arm);
+    			sol2.set(where_arm);
+    			arm_bool = !arm_bool;
+    		} else if(stick.getRawButton(2)&&!arm_bool)  {
+    		
+    		} else if(!arm_bool) {
+    			arm_bool = !arm_bool;
+    		} else {
+    		
+    		}
+    	
+    		if(where_arm==false&&arm_hal.get()==false) {
+    			sol1.set(false);
+    			sol2.set(false);
+    		}
+    	
+    		//SHOOTER SOLENOID CONTROL
+    		if(stick.getRawButton(4)&launcher_bool) {
+    			sol3.set(!sol3.get());
+    			sol4.set(!sol4.get());
+    			launcher_bool = !launcher_bool;
+    		} else if(stick.getRawButton(4)&&!launcher_bool)  {
+    		
+    		} else if(!launcher_bool) {
+    			launcher_bool = !launcher_bool;
+    		} else {
+    		
+    		}
+    	
+    		//FINGER CONTROL
+    		if(stick.getRawButton(6)&&finger_bool) {
+    			if(!where_arm&&!where_finger) {
     			
-    		} else {
-    			sol5.set(!where_finger);
-    			sol6.set(where_finger);
+    			} else {
+    				sol5.set(!where_finger);
+    				sol6.set(where_finger);
+    				finger_bool = !finger_bool;
+    				where_finger = !where_finger;
+    			}
+    		} else if(stick.getRawButton(6)&&!finger_bool)  {
+    		
+    		} else if(!finger_bool) {
     			finger_bool = !finger_bool;
-    			where_finger = !where_finger;
-    		}
-    	} else if(stick.getRawButton(6)&&!finger_bool)  {
-    		
-    	} else if(!finger_bool) {
-    		finger_bool = !finger_bool;
-    		sol5.set(false);
-    		sol6.set(false);
-    	} else {
-    		
-    	}
-    	
-    	//COMP CONTROL
-    	if(stick.getRawButton(8)&&comp_bool) {
-    		comp_bool = !comp_bool;
-    		if(where_comp) {
-    			comp.stop();
-    			where_comp = false;
+    			sol5.set(false);
+    			sol6.set(false);
     		} else {
-    			where_comp = true;    			
-    			comp.start();
+    		
     		}
-    	} else if(stick.getRawButton(8)&&!comp_bool)  {
+    	
+    		//COMP CONTROL
+    		if(stick.getRawButton(8)&&comp_bool) {
+    			comp_bool = !comp_bool;
+    			if(where_comp) {
+    				comp.stop();
+    				where_comp = false;
+    			} else {
+    				where_comp = true;    			
+    				comp.start();
+    			}
+    		} else if(stick.getRawButton(8)&&!comp_bool)  {
     		
-    	} else if(!comp_bool) {
-    		comp_bool = !comp_bool;
-    	}
+    		} else if(!comp_bool) {
+    			comp_bool = !comp_bool;
+    		}
     	
-    	//BALL SHOOTER FIRE CONTROL
-    	if(stick.getRawButton(12)) {
-    		motor1.set(-0.6);
-    		motor2.set(0.6);
-    	}else{
-    		motor1.set(0);
-    		motor2.set(0);
-    	}
+    		//BALL SHOOTER FIRE CONTROL
+    		if(stick.getRawButton(12)) {
+    			motor1.set(-0.6);
+    			motor2.set(0.6);
+    		}else{
+    			motor1.set(0);
+    			motor2.set(0);
+    		}
     	
-    	if(stick.getRawButton(1)) {
-    		motor1.set(0.6);
-    		motor2.set(-0.6);
-    	} else {
-    		motor1.set(0);
-    		motor2.set(0);
-    	}
+    		if(stick.getRawButton(1)) {
+    			motor1.set(0.6);
+    			motor2.set(-0.6);
+    		} else {
+    			motor1.set(0);
+    			motor2.set(0);
+    		}
     	
-    	//BALL SHOOTER INTAKE CONTROL
-    	if(intake_num == -1) {
-    	} else if(stick.getRawButton(3)&&intake_num==0) {
-    		intake_num = 1;
-    		motor3.set(-0.5);
-    	} else if(stick.getRawButton(3)&&intake_num==1)  {
+    		//BALL SHOOTER INTAKE CONTROL
+    		if(intake_num == -1) {
+    		} else if(stick.getRawButton(3)&&intake_num==0) {
+    			intake_num = 1;
+    			motor3.set(-0.5);
+    		} else if(stick.getRawButton(3)&&intake_num==1)  {
     		
-    	} else if(intake_num < pullback&&intake_num != 0) {
-    		motor3.set(0.5);
-    		intake_num += 1;
-    	} else if(intake_num >= pullback&&intake_num != 0) {
-    		intake_num = 0;
-    		motor3.set(0);
-    	}
+    		} else if(intake_num < pullback&&intake_num != 0) {
+    			motor3.set(0.5);
+    			intake_num += 1;
+    		} else if(intake_num >= pullback&&intake_num != 0) {
+    			intake_num = 0;
+    			motor3.set(0);
+    		}
     	
-    	if(stick.getRawButton(9)&&intake_num==0) {
-    		intake_num = -1;
-    		motor3.set(1);
-    	} else if(stick.getRawButton(11)&&intake_num==0) {
-    		intake_num = -1;
-    		motor3.set(-1);
-    	} else if(intake_num==-1) {
-    		intake_num = 0;
-    		motor3.set(0);
-    	}
+    		if(stick.getRawButton(9)&&intake_num==0) {
+    			intake_num = -1;
+    			motor3.set(1);
+    		} else if(stick.getRawButton(11)&&intake_num==0) {
+    			intake_num = -1;
+    			motor3.set(-1);
+    		} else if(intake_num==-1) {
+    			intake_num = 0;
+    			motor3.set(0);
+    		}
+    	
+    		if(sol3.get()==true) {
+    			myRobot.arcadeDrive(stick.getY()*direction*0.7, stick.getX()*-1);
+    		} else {
+    			myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
+    		}
+    	
+        } 
     	
     	//CAMERA
     	if(pstick.getRawButton(1)&&cal_bool) {
@@ -335,11 +379,6 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putBoolean("Compessor", where_comp);
         SmartDashboard.putBoolean("Sensor", arm_hal.get());
         SmartDashboard.putNumber("Direction", direction);
-        if(sol3.get()==true) {
-        	myRobot.arcadeDrive(stick.getY()*direction*0.7, stick.getX()*-1);
-        } else {
-        	myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
-        }
     }
     
     /**
