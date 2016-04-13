@@ -323,11 +323,12 @@ public class Robot extends IterativeRobot {
     		if(sol3.get()==true) {
     			myRobot.arcadeDrive(stick.getY()*direction*0.7, stick.getX()*-1);
     		} else {
-    			myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
+    			myRobot.arcadeDrive(stick.getY()*direction*speedChange, stick.getX()*-1*speedChange);
     		}
     	
-        } 
-    	
+        } else {
+        	myRobot.arcadeDrive(overRide.getY(), overRide.getX()*-1);
+        }
     	//CAMERA
     	if(pstick.getRawButton(1)&&cal_bool) {
     		cal_bool = !cal_bool;
