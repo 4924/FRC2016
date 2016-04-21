@@ -114,6 +114,7 @@ public class Robot extends IterativeRobot {
         distance = new AnalogInput(0);
         pullback = prefs.getDouble("pullback", 0);
         master = false;
+        speedChange = 1.0;
     }
     
     /**
