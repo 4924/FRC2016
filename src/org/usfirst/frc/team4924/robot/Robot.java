@@ -20,64 +20,116 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	Preferences prefs;
-	RobotDrive myRobot;
-	Joystick stick;
+   Preferences prefs;
+   RobotDrive myRobot;
+   Joystick stick;
+   	
+   //CAMERA
+   Joystick pstick;
+   double calX = 0.5;
+   double calY = 0.5;
+   boolean cal_bool = true;
+   Servo camX;
+   double camdY;
+   Servo camY;
+   double camdX;
+   //CAMERA
+    
+    
+   //Toggle Controls
+   
+   /**
+    * Ok soooo. 
+    * blank_bool appears to be the toggle value.
+    * where_blank appears to directly mirror the actual state of blank.
+    * however, the comments below suggest the opposite.
+    * if I am right all blank_bool values should just be initialised as true.
+    * the code works as-is because they are immediately corrected by their corresponding if statement.
+    * all of the "false is down" and "false is in" nonsense should acually reflect the where_blank value.
+    * MUST TEST
+    */
+    
+    //direction
+    //1 is forward
+    double direction = 1;
+    boolean direction_bool = true;
+    
+    //arm
+    //starts down so:	
+    //false is down (see above should be true)
+    boolean arm_bool = false;
+    //or true is down
+    boolean where_arm = true;
+    
+    //finger
+    //starts in so
+    //false is in (see above should be true)
+    boolean finger_bool = false;
+    //or true is in
+    boolean where_finger = true;
+    
+    //comp
+    //starts running so
+    //true is runnning(see above should be true)
+    boolean comp_bool = true;
+    //or true is running
+    boolean where_comp = true;
+    
+    //launcher
+    //true is down (once again only a toggle value)
+    boolean launcher_bool = true;
+    //we only really need a toggle value to control a solenoid because of blank.set(!blanck.get())
+    //the reason all the others have location values is because of the anti-bummper-quick-release
+    //seems to me now that those are not even necessary
+    //Toggle Control
+    
 	
-	//CAMERA
-	Joystick pstick;
-	double calX = 0.5;
-	double calY = 0.5;
-	boolean cal_bool = true;
-    Servo camX;
-    double camdY;
-    Servo camY;
-    double camdX;
-    //CAMERA
-    
-    double autoNum;
-    
-	double direction = 1;
-	boolean direction_bool = true;
-	//false is down
-	boolean arm_bool = false;
-	//true is down
-	boolean launcher_bool = true;
-	//false is in
-	boolean finger_bool = false;
-	//true is runnning
-	boolean comp_bool = true;
-	boolean where_comp = true;
-	boolean where_arm = true;
-	boolean where_finger = true;
-	int autoLoopCounter;
-	SmartDashboard dash;
+    //Pneumatics
     Compressor comp;
-	Solenoid sol1;
+    Solenoid sol1;
     Solenoid sol2;
-	Solenoid sol3;
+    Solenoid sol3;
     Solenoid sol4;
-	Solenoid sol5;
+    Solenoid sol5;
     Solenoid sol6;
+    //Pneumatics
+    
+    
+    //Launcher
+    //Launcher status
     int intake_num = 0;
+    //Launcher motors
     CANTalon motor1;
-    double motor1speed;
-    double motor2speed;
-    double pullback;
     CANTalon motor2;
     CANTalon motor3;
+    //Launcher
+    
+    
+    //Presets
+    //Dashboard
+    SmartDashboard dash;   
+    double motor1speed;
+    double motor2speed;
+    //hardcoded
+    double pullback;
+    //Presets
+    
+   
+    //Sensors
     DigitalInput arm_hal;
     AnalogInput psi;
     AnalogInput distance;
-
+    //Sensors
+    
+    
+    //autonomous
+    double autoNum;
+    int autoLoopCounter;
+    //autonomous	
 	
     /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
+     * robotInit runs once at startup
      */
-	public void onepress() {
-		direction = direction * -1;
-	}
 	
     public void robotInit() {
     	prefs = Preferences. getInstance();
@@ -86,28 +138,68 @@ public class Robot extends IterativeRobot {
     	pstick = new Joystick(1);
     	dash = new SmartDashboard();
     	comp = new Compressor();
+    	comp.start();
+    	
+    	
+    	//Solenoid
+    	
+    	/**
+    	 * sol1 is arm_down and starts True
+    	 * sol2 is arm_up and starts False
+    	 * sol3 is launcher_down and starts False
+    	 * sol4 is launcher_up and starts True
+    	 * sol5 is finger_out and starts False
+    	 * sol6 is finger_in and starts True
+    	 */
+    	
     	sol1 = new Solenoid(0);
         sol2 = new Solenoid(1);
     	sol3 = new Solenoid(2);
         sol4 = new Solenoid(3);
     	sol5 = new Solenoid(4);
-        sol6 = new Solenoid(5);        
+        sol6 = new Solenoid(5);
+        
+        //arm (starts down)
+        //where_arm initialises as true so
+        //sol1 is arm_down (starts true)
     	sol1.set(where_arm);
+    	//sol2 is arm_up (starts false)
     	sol2.set(!where_arm);
+    	
+    	//launcher (starts up)
+    	//sol3 is launcher_down
     	sol3.set(false);
+    	//sol4 is launcher_up 
     	sol4.set(true);
+    	
+    	//Finger (starts in)
+    	//sol5 is finger_out
     	sol5.set(false);
+    	//sol6 is finger_in
     	sol6.set(true);
-    	comp.start();
+    	//Solenoid
+    	
+    	
+        //Camera
         camY = new Servo(4);
         camX = new Servo(3);
+        //Camera
+        
+        
+        //Non-drive Motors
+        //firing motors
         motor1 = new CANTalon(2);
         motor2 = new CANTalon(4);
+        //intake motor
         motor3 = new  CANTalon(3);
+        //Non-drive Motors
+        
+        
+        //Sensors
         arm_hal = new DigitalInput(1);
         psi = new AnalogInput(3);
         distance = new AnalogInput(0);
-        pullback = prefs.getDouble("pullback", 0);
+        //Sensors
     }
     
     /**
@@ -187,10 +279,7 @@ public class Robot extends IterativeRobot {
     		
     	}
     	
-    	if(where_arm==false&&arm_hal.get()==false) {
-    		sol1.set(false);
-    		sol2.set(false);
-    	}
+
     	
     	//SHOOTER SOLENOID CONTROL
     	if(stick.getRawButton(4)&launcher_bool) {
