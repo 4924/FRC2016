@@ -13,17 +13,12 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/*** The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
- */
+
 public class Robot extends IterativeRobot {
    Preferences prefs;
    RobotDrive myRobot;
    Joystick stick;
-   	
+
    //CAMERA
    Joystick pstick;
    double calX = 0.5;
@@ -34,47 +29,34 @@ public class Robot extends IterativeRobot {
    Servo camY;
    double camdX;
    //CAMERA
-    
-    
+
+
    //Toggle Controls
-   
-   /**
-    * Ok soooo. 
-    * blank_bool appears to be the toggle value.
-    * where_blank appears to directly mirror the actual state of blank.
-    * however, the comments below suggest the opposite.
-    * if I am right all blank_bool values should just be initialised as true.
-    * the code works as-is because they are immediately corrected by their corresponding if statement.
-    * all of the "false is down" and "false is in" nonsense should acually reflect the where_blank value.
-    * MUST TEST
-    */
-    
+
+
     //direction
     //1 is forward
     double direction = 1;
     boolean direction_bool = true;
-    
+
     //arm
-    //starts down so:	
-    //false is down (see above should be true)
-    boolean arm_bool = false;
+    //starts down
+    boolean arm_bool = true;
     //or true is down
     boolean where_arm = true;
-    
+
     //finger
-    //starts in so
-    //false is in (see above should be true)
-    boolean finger_bool = false;
+    //starts in
+    boolean finger_bool = true;
     //or true is in
     boolean where_finger = true;
-    
+
     //comp
-    //starts running so
-    //true is runnning(see above should be true)
+    //starts running
     boolean comp_bool = true;
     //or true is running
     boolean where_comp = true;
-    
+
     //launcher
     //true is down (once again only a toggle value)
     boolean launcher_bool = true;
@@ -82,8 +64,8 @@ public class Robot extends IterativeRobot {
     //the reason all the others have location values is because of the anti-bummper-quick-release
     //seems to me now that those are not even necessary
     //Toggle Control
-    
-	
+
+
     //Pneumatics
     Compressor comp;
     Solenoid sol1;
@@ -93,8 +75,8 @@ public class Robot extends IterativeRobot {
     Solenoid sol5;
     Solenoid sol6;
     //Pneumatics
-    
-    
+
+
     //Launcher
     //Launcher status
     int intake_num = 0;
@@ -103,34 +85,34 @@ public class Robot extends IterativeRobot {
     CANTalon motor2;
     CANTalon motor3;
     //Launcher
-    
-    
+
+
     //Presets
     //Dashboard
-    SmartDashboard dash;   
+    SmartDashboard dash;
     double motor1speed;
     double motor2speed;
     //hardcoded
     double pullback;
     //Presets
-    
-   
+
+
     //Sensors
     DigitalInput arm_hal;
     AnalogInput psi;
     AnalogInput distance;
     //Sensors
-    
-    
+
+
     //autonomous
     double autoNum;
     int autoLoopCounter;
-    //autonomous	
-	
+    //autonomous
+
     /**
      * robotInit runs once at startup
      */
-	
+
     public void robotInit() {
     	prefs = Preferences. getInstance();
     	myRobot = new RobotDrive(0,1);
@@ -139,10 +121,10 @@ public class Robot extends IterativeRobot {
     	dash = new SmartDashboard();
     	comp = new Compressor();
     	comp.start();
-    	
-    	
+
+
     	//Solenoid
-    	
+
     	/**
     	 * sol1 is arm_down and starts True
     	 * sol2 is arm_up and starts False
@@ -151,41 +133,41 @@ public class Robot extends IterativeRobot {
     	 * sol5 is finger_out and starts False
     	 * sol6 is finger_in and starts True
     	 */
-    	
+
     	sol1 = new Solenoid(0);
         sol2 = new Solenoid(1);
     	sol3 = new Solenoid(2);
         sol4 = new Solenoid(3);
     	sol5 = new Solenoid(4);
         sol6 = new Solenoid(5);
-        
+
         //arm (starts down)
         //where_arm initialises as true so
         //sol1 is arm_down (starts true)
     	sol1.set(where_arm);
     	//sol2 is arm_up (starts false)
     	sol2.set(!where_arm);
-    	
+
     	//launcher (starts up)
     	//sol3 is launcher_down
     	sol3.set(false);
-    	//sol4 is launcher_up 
+    	//sol4 is launcher_up
     	sol4.set(true);
-    	
+
     	//Finger (starts in)
     	//sol5 is finger_out
     	sol5.set(false);
     	//sol6 is finger_in
     	sol6.set(true);
     	//Solenoid
-    	
-    	
+
+
         //Camera
         camY = new Servo(4);
         camX = new Servo(3);
         //Camera
-        
-        
+
+
         //Non-drive Motors
         //firing motors
         motor1 = new CANTalon(2);
@@ -193,15 +175,15 @@ public class Robot extends IterativeRobot {
         //intake motor
         motor3 = new  CANTalon(3);
         //Non-drive Motors
-        
-        
+
+
         //Sensors
         arm_hal = new DigitalInput(1);
         psi = new AnalogInput(3);
         distance = new AnalogInput(0);
         //Sensors
     }
-    
+
     /**
      * This function is run once each time the robot enters autonomous mode
      */
@@ -212,7 +194,7 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during autonomous
      */
-    
+
     public void autonomousPeriodic() {
 
     	if(autoLoopCounter < 3) {
@@ -232,7 +214,7 @@ public class Robot extends IterativeRobot {
 			myRobot.drive(0.0, 0.0); 	// stop robot
 		}
     }
-    
+
     /**
      * This function is called once each time the robot enters tele-operated mode
      */
@@ -258,13 +240,13 @@ public class Robot extends IterativeRobot {
     		direction_bool = !direction_bool;
     		direction = direction * -1;
     	} else if(stick.getRawButton(5)&&!direction_bool)  {
-    		
+
     	} else if(!direction_bool) {
     		direction_bool = !direction_bool;
     	} else {
-    		
+
     	}
-    	
+
     	//ARM CONTROL
     	if(stick.getRawButton(2)&&arm_bool) {
     		where_arm = !where_arm;
@@ -272,32 +254,32 @@ public class Robot extends IterativeRobot {
     		sol2.set(where_arm);
     		arm_bool = !arm_bool;
     	} else if(stick.getRawButton(2)&&!arm_bool)  {
-    		
+
     	} else if(!arm_bool) {
     		arm_bool = !arm_bool;
     	} else {
-    		
-    	}
-    	
 
-    	
+    	}
+
+
+
     	//SHOOTER SOLENOID CONTROL
     	if(stick.getRawButton(4)&launcher_bool) {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
     		launcher_bool = !launcher_bool;
     	} else if(stick.getRawButton(4)&&!launcher_bool)  {
-    		
+
     	} else if(!launcher_bool) {
     		launcher_bool = !launcher_bool;
     	} else {
-    		
+
     	}
-    	
+
     	//FINGER CONTROL
     	if(stick.getRawButton(6)&&finger_bool) {
     		if(!where_arm&&!where_finger) {
-    			
+
     		} else {
     			sol5.set(!where_finger);
     			sol6.set(where_finger);
@@ -305,15 +287,15 @@ public class Robot extends IterativeRobot {
     			where_finger = !where_finger;
     		}
     	} else if(stick.getRawButton(6)&&!finger_bool)  {
-    		
+
     	} else if(!finger_bool) {
     		finger_bool = !finger_bool;
     		sol5.set(false);
     		sol6.set(false);
     	} else {
-    		
+
     	}
-    	
+
     	//COMP CONTROL
     	if(stick.getRawButton(8)&&comp_bool) {
     		comp_bool = !comp_bool;
@@ -321,15 +303,15 @@ public class Robot extends IterativeRobot {
     			comp.stop();
     			where_comp = false;
     		} else {
-    			where_comp = true;    			
+    			where_comp = true;
     			comp.start();
     		}
     	} else if(stick.getRawButton(8)&&!comp_bool)  {
-    		
+
     	} else if(!comp_bool) {
     		comp_bool = !comp_bool;
     	}
-    	
+
     	//BALL SHOOTER FIRE CONTROL
     	if(stick.getRawButton(12)) {
     		motor1.set(-0.6);
@@ -338,7 +320,7 @@ public class Robot extends IterativeRobot {
     		motor1.set(0);
     		motor2.set(0);
     	}
-    	
+
     	if(stick.getRawButton(1)) {
     		motor1.set(0.6);
     		motor2.set(-0.6);
@@ -346,14 +328,14 @@ public class Robot extends IterativeRobot {
     		motor1.set(0);
     		motor2.set(0);
     	}
-    	
+
     	//BALL SHOOTER INTAKE CONTROL
     	if(intake_num == -1) {
     	} else if(stick.getRawButton(3)&&intake_num==0) {
     		intake_num = 1;
     		motor3.set(-0.5);
     	} else if(stick.getRawButton(3)&&intake_num==1)  {
-    		
+
     	} else if(intake_num < pullback&&intake_num != 0) {
     		motor3.set(0.5);
     		intake_num += 1;
@@ -361,7 +343,7 @@ public class Robot extends IterativeRobot {
     		intake_num = 0;
     		motor3.set(0);
     	}
-    	
+
     	if(stick.getRawButton(9)&&intake_num==0) {
     		intake_num = -1;
     		motor3.set(1);
@@ -372,24 +354,24 @@ public class Robot extends IterativeRobot {
     		intake_num = 0;
     		motor3.set(0);
     	}
-    	
+
     	//CAMERA
     	if(pstick.getRawButton(1)&&cal_bool) {
     		cal_bool = !cal_bool;
     		calX = camdX;
     		calY = camdY;
     	} else if(pstick.getRawButton(1)&&!cal_bool)  {
-    		
+
     	} else if(!cal_bool) {
     		cal_bool = !cal_bool;
-    	} 
-    	        
+    	}
+
         if(pstick.getX()>=0) {
         	camdX = pstick.getX()*(1-calX)+calX;
             camX.set(pstick.getX()*(1-calX)+calX);
         } else {
         	camdX = pstick.getX()*calX+calX;
-            camX.set(pstick.getX()*calX+calX);        	
+            camX.set(pstick.getX()*calX+calX);
         }
 
         if(pstick.getY()>=0) {
@@ -397,18 +379,18 @@ public class Robot extends IterativeRobot {
             camY.set(pstick.getY()*(1-calY)+calY);
         } else {
         	camdY = pstick.getY()*calY+calY;
-            camY.set(pstick.getY()*calY+calY);        	
+            camY.set(pstick.getY()*calY+calY);
         }
-    	
+
     	if(pstick.getRawButton(2)) {
     		calX = 0.5;
     	    calY = 0.5;
     	}
         //CAMERA
-    	
-    	
-    	
-    	
+
+
+
+
     	motor1speed = prefs.getDouble("Motor 1 Speed", 0);
         motor2speed = prefs.getDouble("Motor 2 Speed", 0);
         pullback = prefs.getDouble("pullback", 0);
@@ -430,12 +412,12 @@ public class Robot extends IterativeRobot {
         	myRobot.arcadeDrive(stick.getY()*direction, stick.getX()*-1);
         }
     }
-    
+
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
     	LiveWindow.run();
     }
-    
+
 }
