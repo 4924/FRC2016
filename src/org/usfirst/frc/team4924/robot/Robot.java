@@ -264,7 +264,7 @@ public class Robot extends IterativeRobot {
 
 
     	//SHOOTER SOLENOID CONTROL
-    	if(stick.getRawButton(4)&launcher_bool) {
+    	if(stick.getRawButton(4)&&launcher_bool) {
     		sol3.set(!sol3.get());
     		sol4.set(!sol4.get());
     		launcher_bool = !launcher_bool;
