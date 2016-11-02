@@ -1,7 +1,7 @@
 package org.usfirst.frc.team4924.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -81,9 +81,9 @@ public class Robot extends IterativeRobot {
     //Launcher status
     int intake_num = 0;
     //Launcher motors
-    CANTalon motor1;
-    CANTalon motor2;
-    CANTalon motor3;
+    Talon motor1;
+    Talon motor2;
+    Talon motor3;
     //Launcher
 
 
@@ -170,10 +170,10 @@ public class Robot extends IterativeRobot {
 
         //Non-drive Motors
         //firing motors
-        motor1 = new CANTalon(2);
-        motor2 = new CANTalon(4);
+        motor1 = new Talon(7);
+        motor2 = new Talon(6);
         //intake motor
-        motor3 = new  CANTalon(3);
+        motor3 = new  Talon(5);
         //Non-drive Motors
 
 
